@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Holo Card AR Prototype</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; font-family: system-ui, sans-serif; }
+      #hint { position: fixed; z-index: 10; left: 1rem; right: 1rem; bottom: 1.5rem; margin: auto;
+        max-width: 28rem; padding: .8rem 1rem; border-radius: .8rem; color: white;
+        background: rgba(0, 0, 0, .7); text-align: center; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="hint" role="status">Allow camera access, then point at the sample card.</div>
+
+    <!-- Replace the target URL with ./assets/targets.mind after compiling your own card. -->
+    <a-scene
+      mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      embedded>
+      <a-assets>
+        <!-- Replace this sample model with ./assets/character.glb. -->
+        <a-asset-item id="character" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-entity id="card-target" mindar-image-target="targetIndex: 0">
+        <a-gltf-model
+          src="#character"
+          position="0 0 0.1"
+          scale="0.005 0.005 0.005"
+          animation="property: position; from: 0 0 0.1; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+        </a-gltf-model>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      const hint = document.querySelector('#hint');
+      const target = document.querySelector('#card-target');
+      target.addEventListener('targetFound', () => { hint.textContent = 'Move the card to see the character follow it.'; });
+      target.addEventListener('targetLost', () => { hint.textContent = 'Point your camera at the card again.'; });
+    </script>
+  </body>
+</html>
