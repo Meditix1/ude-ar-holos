@@ -30,6 +30,7 @@
         background: #ffd36f; color: #321323; font: inherit; font-size: 1rem; font-weight: 700;
         cursor: pointer; touch-action: manipulation; }
       #actions button:disabled { opacity: .7; cursor: wait; }
+      #actions #back-button { width: 44px; min-width: 44px; padding: 0; font-size: 1.4rem; line-height: 1; }
       #actions button:focus-visible, #credit:focus-visible { outline: 3px solid white; outline-offset: 3px; }
       #credit { position: fixed; z-index: 10;
         top: max(.75rem, env(safe-area-inset-top)); right: max(.75rem, env(safe-area-inset-right));
@@ -57,6 +58,7 @@
       <h1 id="story-title">Chiah pah bway?</h1>
       <p id="story-text">“Have you eaten yet?” Tap to see the meal behind this greeting.</p>
       <div id="actions">
+        <button id="back-button" type="button" aria-label="Hide meal and return to ghost" title="Hide meal" hidden>&#8592;</button>
         <button id="reveal-button" type="button">Reveal the meal</button>
         <button id="audio-button" type="button" hidden>Hear the phrase</button>
       </div>
@@ -81,17 +83,23 @@
         <a-plane id="ghost" src="#ghost-image" material="transparent: true; side: double; shader: flat"
           width="1" height="1.04" position="0 0.28 0.2" scale="0.01 0.01 0.01"
           animation__pop="property: scale; from: 0.01 0.01 0.01; to: 1.6 1.6 1.6; dur: 700; easing: easeOutElastic; startEvents: pop"
-          animation__make_room="property: position; from: 0 0.28 0.2; to: -0.23 0.42 0.2; dur: 450; easing: easeOutCubic; startEvents: make-room"
-          animation__shrink="property: scale; from: 1.6 1.6 1.6; to: 0.84 0.84 0.84; dur: 450; easing: easeOutCubic; startEvents: make-room"></a-plane>
+          animation__sway="property: rotation; from: 0 0 -4; to: 0 0 4; dur: 2000; loop: true; dir: alternate; easing: easeInOutSine; startEvents: pop"
+          animation__make_room="property: position; from: 0 0.28 0.2; to: -0.9 0.65 0.5; dur: 450; easing: easeOutCubic; startEvents: make-room"
+          animation__shrink="property: scale; from: 1.6 1.6 1.6; to: 0.84 0.84 0.84; dur: 450; easing: easeOutCubic; startEvents: make-room"
+          animation__return="property: position; to: 0 0.28 0.2; dur: 450; easing: easeOutCubic; startEvents: restore"
+          animation__grow="property: scale; to: 1.6 1.6 1.6; dur: 450; easing: easeOutCubic; startEvents: restore"></a-plane>
 
         <a-entity id="meal" visible="false">
-          <a-ring position="0 -0.22 0.055" radius-inner="0.58" radius-outer="0.64"
+          <a-ring position="0.58 -0.42 0.055" radius-inner="0.58" radius-outer="0.64"
             material="color: #ffd36f; opacity: 0.55; transparent: true; side: double"
-            animation="property: rotation; from: 0 0 0; to: 0 0 360; dur: 12000; loop: true; easing: linear"></a-ring>
-          <a-gltf-model id="food-model" src="#character" position="0 -0.22 0.08" rotation="90 0 0"
-            scale="0.01 0.01 0.01"
-            animation__reveal="property: scale; from: 0.01 0.01 0.01; to: 0.4 0.4 0.4; dur: 650; easing: easeOutElastic; startEvents: reveal"
-            animation__float="property: position; from: 0 -0.22 0.08; to: 0 -0.22 0.11; dur: 1400; easing: easeInOutSine; loop: true; dir: alternate; startEvents: reveal"></a-gltf-model>
+            animation="property: rotation; from: 0 0 0; to: 0 0 -360; dur: 12000; loop: true; easing: linear"></a-ring>
+          <a-entity id="food-motion" position="0.58 -0.42 0.08"
+            animation__spin="property: rotation; from: 0 0 0; to: 0 0 360; dur: 12000; loop: true; easing: linear; startEvents: reveal"
+            animation__float="property: position; from: 0.58 -0.42 0.08; to: 0.58 -0.42 0.11; dur: 1400; easing: easeInOutSine; loop: true; dir: alternate; startEvents: reveal">
+            <a-gltf-model id="food-model" src="#character" rotation="90 0 0"
+              scale="0.01 0.01 0.01"
+              animation__reveal="property: scale; from: 0.01 0.01 0.01; to: 0.4 0.4 0.4; dur: 650; easing: easeOutElastic; startEvents: reveal"></a-gltf-model>
+          </a-entity>
         </a-entity>
       </a-entity>
     </a-scene>
@@ -101,16 +109,19 @@
       const story = document.querySelector('#story');
       const storyTitle = document.querySelector('#story-title');
       const storyText = document.querySelector('#story-text');
+      const backButton = document.querySelector('#back-button');
       const revealButton = document.querySelector('#reveal-button');
       const audioButton = document.querySelector('#audio-button');
       const phraseAudio = document.querySelector('#phrase-audio');
       const target = document.querySelector('#card-target');
       const ghost = document.querySelector('#ghost');
       const meal = document.querySelector('#meal');
+      const foodMotion = document.querySelector('#food-motion');
       const model = document.querySelector('#food-model');
       let modelReady = false;
       let targetVisible = false;
       let revealed = false;
+      let hasSeenTarget = false;
 
       // Set to true after adding assets/chiah-pah-bway.mp3, recorded by a fluent speaker.
       const phraseAudioReady = true;
@@ -127,6 +138,7 @@
         storyText.textContent = revealed
           ? '“Have you eaten yet?” can also mean “Are you okay?” The meal is a symbol of care.'
           : '“Have you eaten yet?” Tap to see the meal behind this greeting.';
+        backButton.hidden = !revealed;
         revealButton.hidden = revealed;
         revealButton.disabled = !modelReady;
         if (!modelReady && !revealed) revealButton.textContent = 'Loading the meal…';
@@ -140,12 +152,10 @@
       });
       target.addEventListener('targetFound', () => {
         targetVisible = true;
-        revealed = false;
-        meal.setAttribute('visible', false);
-        model.setAttribute('scale', '0.01 0.01 0.01');
-        ghost.setAttribute('position', '0 0.28 0.2');
-        ghost.setAttribute('scale', '0.01 0.01 0.01');
-        ghost.emit('pop');
+        if (!hasSeenTarget) {
+          hasSeenTarget = true;
+          ghost.emit('pop');
+        }
         updateUI();
       });
       target.addEventListener('targetLost', () => {
@@ -159,6 +169,15 @@
         meal.setAttribute('visible', true);
         ghost.emit('make-room');
         model.emit('reveal');
+        foodMotion.emit('reveal');
+        updateUI();
+      });
+      backButton.addEventListener('click', () => {
+        if (!targetVisible || !revealed) return;
+        revealed = false;
+        meal.setAttribute('visible', false);
+        model.setAttribute('scale', '0.01 0.01 0.01');
+        ghost.emit('restore');
         updateUI();
       });
       audioButton.addEventListener('click', async () => {
