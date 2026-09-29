@@ -1,45 +1,51 @@
-# Holo Card AR prototype
+# UDE AR Holos
 
-This is a one-card, no-install WebAR prototype. MindAR image tracking keeps the ghost and meal attached to the card in the camera view.
+A browser-based AR prototype for Holo cards. Point a camera at the **“Chiah Pah Bway?”** card to see a ghost rise from the artwork, then tap **Reveal the meal** to show a 3D plate of Hainanese chicken rice. The experience runs in a web browser; visitors do not need to install an app.
 
-## Run the Chiah Pah Bway prototype
+![Chiah Pah Bway Holo card](assets/target_holo.png)
 
-1. In a terminal, change into this `ude-ar-holos` folder and run `node server.js`.
-2. Open **http://localhost:8000** on the same computer. Do not open `index.html` directly as a `file://` URL; the browser blocks the model and tracking-file requests that way.
-3. Allow camera access, then point the webcam at a print or another screen showing `assets/target_holo.png`.
-4. For a phone test, host this folder at an **HTTPS** URL, open it in Safari or Chrome, allow camera access, and point the phone at the card. A plain local-network HTTP address will not grant phone camera access.
+## Try it locally
 
-The page uses `assets/targets.mind`, `assets/ghost-cutout.png`, and `assets/hainanese_chicken_rice.glb`. The ghost pops out when the card is found. Tap **Reveal the meal** to bring up the food model. The food model is scaled to 20% and rotated 90 degrees so the plate faces the camera.
+You need Node.js and a computer with a webcam. This project has no npm dependencies or build step.
 
-### Add the pronunciation later
+```powershell
+git clone https://github.com/Meditix1/ude-ar-holos.git
+cd ude-ar-holos
+node server.js
+```
 
-Record a fluent Hokkien speaker saying “Chiah pah bway?”, save the recording as `assets/chiah-pah-bway.mp3`, then change `const phraseAudioReady = false;` to `true` in `index.html`. The **Hear the phrase** button will appear. A tap starts playback, as mobile browsers require for audio.
+Open **http://localhost:8000**, allow camera access, and point the webcam at a printout or another screen showing [`assets/target_holo.png`](assets/target_holo.png). When the ghost appears, tap **Reveal the meal**.
 
-The model metadata credits [National Heritage Board, "Hainanese Chicken Rice"](https://sketchfab.com/3d-models/hainanese-chicken-rice-6a0d0aa3851849508f584248f96cd417) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Keep this attribution with any published prototype that uses it.
+Keep the server running while you test. Opening `index.html` directly as a `file://` URL prevents the browser from loading the tracking file and 3D model.
 
-## Use a different card or model later
+## How it works
 
-1. Finish one card face. Use an image with clear, varied detail across the card; use the *final* artwork as the tracking target.
-2. Upload that image to the [MindAR image target compiler](https://hiukim.github.io/mind-ar-js-doc/tools/compile/), inspect the feature distribution, and replace `assets/targets.mind` with the new file.
-3. Change `imageTargetSrc` in `index.html` to `./assets/targets.mind`.
-4. Export your character as a lightweight `.glb`, save it in `assets`, and change the `a-asset-item` URL in `index.html` to its filename.
-5. Adjust the model's `scale`, `position`, and `rotation` until it appears to emerge from the artwork. Keep `targetIndex: 0` for the first card.
-6. Print a QR code that links to the hosted page. Put it on the back or outside the tracked artwork. Test the *printed* card on iPhone and Android in bright and dim light, especially if it has reflective foil.
+The card image is preprocessed into `assets/targets.mind`. [MindAR](https://hiukim.github.io/mind-ar-js-doc/) detects that image in the camera feed and anchors the ghost and meal to it. [A-Frame](https://aframe.io/) renders the image cutout, model, and animations. The QR code you print on a card should open the hosted page; the card artwork is what keeps the AR content attached.
 
-The QR code opens the webpage. Once open, the webpage uses the card artwork as its tracking target; the QR code itself does not keep the model attached to the card.
+| File | Purpose |
+| --- | --- |
+| `index.html` | AR scene, interface, and interactions |
+| `server.js` | Local development server only |
+| `assets/target_holo.png` | Card artwork to print or display for scanning |
+| `assets/targets.mind` | Compiled image-tracking target |
+| `assets/ghost-cutout.png` | Transparent ghost sprite |
+| `assets/hainanese_chicken_rice.glb` | 3D meal shown after a tap |
 
-## Put it on the web
+## Customize a card
 
-The sibling `../publish` folder contains the ready-to-upload static site. It has `index.html` plus the tracking image, ghost sprite, compiled target, and 3 MB model. It excludes the local Node server and the unused 22 MB model. After editing this source folder, run `./sync-publish.ps1` to update `../publish`.
+1. Finish the card artwork, then compile it with the [MindAR image target compiler](https://hiukim.github.io/mind-ar-js-doc/tools/compile/). Replace `assets/targets.mind` with the downloaded file.
+2. Replace the ghost sprite and/or GLB model in `assets`, and update their paths in `index.html`.
+3. Adjust the AR elements' position, rotation, and scale in `index.html` to fit the artwork. Keep `targetIndex: 0` when tracking one card.
+4. Test the printed card under different lighting, especially if it has reflective foil.
 
-1. Visit [Netlify Drop](https://app.netlify.com/drop) and drag the entire `publish` folder onto the upload area.
-2. Open the resulting `https://...netlify.app` address on a phone, allow camera access, and point it at the printed card.
-3. Make a QR code for that final address. To update the site later, rebuild the `publish` folder from the latest source files and upload it again through the site's deploy page.
+### Optional pronunciation audio
 
-Keep the 3D model attribution on the page when publishing.
+Record a fluent Hokkien speaker saying “Chiah pah bway?” and save it as `assets/chiah-pah-bway.mp3`. In `index.html`, change `const phraseAudioReady = false;` to `true`. The **Hear the phrase** button will then appear and play the recording when tapped.
 
-## References
+## Host it online
 
-- [MindAR quick start](https://hiukim.github.io/mind-ar-js-doc/quick-start/overview/)
-- [MindAR target compilation](https://hiukim.github.io/mind-ar-js-doc/quick-start/compile/)
-- [Camera permission and HTTPS requirement](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
+Host the **repository root** as a static website, with `index.html` at the site root. No build command or running Node server is required on the host. Use HTTPS so mobile browsers can request camera access. After deploying, open the site on a phone, scan the printed card, and make a QR code for the final website URL.
+
+## Credits
+
+The [Hainanese Chicken Rice model by National Heritage Board](https://sketchfab.com/3d-models/hainanese-chicken-rice-6a0d0aa3851849508f584248f96cd417) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The website includes a visible attribution link; keep it when publishing the prototype.
