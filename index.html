@@ -61,8 +61,7 @@
         <button id="audio-button" type="button" hidden>Hear the phrase</button>
       </div>
     </section>
-    <!-- Add an accurate Hokkien recording here later, then enable the button in the script. -->
-    <audio id="phrase-audio" src="./assets/chiah-pah-bway.mp3" preload="none"></audio>
+    <audio id="phrase-audio" src="./assets/sound.mp3" preload="none"></audio>
     <a id="credit" href="https://sketchfab.com/3d-models/hainanese-chicken-rice-6a0d0aa3851849508f584248f96cd417" target="_blank" rel="noopener noreferrer">3D model: National Heritage Board (CC BY 4.0)</a>
 
     <a-scene
@@ -81,17 +80,17 @@
       <a-entity id="card-target" mindar-image-target="targetIndex: 0">
         <a-plane id="ghost" src="#ghost-image" material="transparent: true; side: double; shader: flat"
           width="1" height="1.04" position="0 0.28 0.2" scale="0.01 0.01 0.01"
-          animation__pop="property: scale; from: 0.01 0.01 0.01; to: 0.8 0.8 0.8; dur: 700; easing: easeOutElastic; startEvents: pop"
+          animation__pop="property: scale; from: 0.01 0.01 0.01; to: 1.6 1.6 1.6; dur: 700; easing: easeOutElastic; startEvents: pop"
           animation__make_room="property: position; from: 0 0.28 0.2; to: -0.23 0.42 0.2; dur: 450; easing: easeOutCubic; startEvents: make-room"
-          animation__shrink="property: scale; from: 0.8 0.8 0.8; to: 0.42 0.42 0.42; dur: 450; easing: easeOutCubic; startEvents: make-room"></a-plane>
+          animation__shrink="property: scale; from: 1.6 1.6 1.6; to: 0.84 0.84 0.84; dur: 450; easing: easeOutCubic; startEvents: make-room"></a-plane>
 
         <a-entity id="meal" visible="false">
-          <a-ring position="0 -0.22 0.055" radius-inner="0.29" radius-outer="0.32"
+          <a-ring position="0 -0.22 0.055" radius-inner="0.58" radius-outer="0.64"
             material="color: #ffd36f; opacity: 0.55; transparent: true; side: double"
             animation="property: rotation; from: 0 0 0; to: 0 0 360; dur: 12000; loop: true; easing: linear"></a-ring>
           <a-gltf-model id="food-model" src="#character" position="0 -0.22 0.08" rotation="90 0 0"
             scale="0.01 0.01 0.01"
-            animation__reveal="property: scale; from: 0.01 0.01 0.01; to: 0.2 0.2 0.2; dur: 650; easing: easeOutElastic; startEvents: reveal"
+            animation__reveal="property: scale; from: 0.01 0.01 0.01; to: 0.4 0.4 0.4; dur: 650; easing: easeOutElastic; startEvents: reveal"
             animation__float="property: position; from: 0 -0.22 0.08; to: 0 -0.22 0.11; dur: 1400; easing: easeInOutSine; loop: true; dir: alternate; startEvents: reveal"></a-gltf-model>
         </a-entity>
       </a-entity>
@@ -114,7 +113,7 @@
       let revealed = false;
 
       // Set to true after adding assets/chiah-pah-bway.mp3, recorded by a fluent speaker.
-      const phraseAudioReady = false;
+      const phraseAudioReady = true;
       audioButton.hidden = !phraseAudioReady;
 
       const updateUI = () => {
