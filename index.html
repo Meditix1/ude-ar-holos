@@ -93,12 +93,14 @@
           <a-ring position="0.1 -0.42 0.055" radius-inner="0.58" radius-outer="0.64"
             material="color: #ffd36f; opacity: 0.55; transparent: true; side: double"
             animation="property: rotation; from: 0 0 0; to: 0 0 -360; dur: 12000; loop: true; easing: linear"></a-ring>
-          <a-entity id="food-motion" position="0.58 -0.42 0.08"
-            animation__spin="property: rotation; from: 0 0 0; to: 0 0 360; dur: 12000; loop: true; easing: linear; startEvents: reveal"
+          <a-entity id="food-motion" position="0.1 -0.42 0.08"
             animation__float="property: position; from: 0.1 -0.42 0.08; to: 0.1 -0.42 0.11; dur: 1400; easing: easeInOutSine; loop: true; dir: alternate; startEvents: reveal">
-            <a-gltf-model id="food-model" src="#character" rotation="90 0 0"
-              scale="0.01 0.01 0.01"
-              animation__reveal="property: scale; from: 0.01 0.01 0.01; to: 0.4 0.4 0.4; dur: 650; easing: easeOutElastic; startEvents: reveal"></a-gltf-model>
+            <a-entity rotation="50 0 0">
+              <a-gltf-model id="food-model" src="#character" rotation="0 0 0"
+                scale="0.01 0.01 0.01"
+                animation__spin="property: rotation; from: 0 0 0; to: 0 360 0; dur: 12000; loop: true; easing: linear; startEvents: reveal"
+                animation__reveal="property: scale; from: 0.01 0.01 0.01; to: 0.4 0.4 0.4; dur: 650; easing: easeOutElastic; startEvents: reveal"></a-gltf-model>
+            </a-entity>
           </a-entity>
         </a-entity>
       </a-entity>
