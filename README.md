@@ -1,16 +1,19 @@
 # Holo Card AR prototype
 
-This is a one-card, no-install WebAR prototype. The page uses MindAR image tracking to keep a 3D character attached to the card in the camera view.
+This is a one-card, no-install WebAR prototype. MindAR image tracking keeps the ghost and meal attached to the card in the camera view.
 
-## Run the current Hainanese chicken rice prototype
+## Run the Chiah Pah Bway prototype
 
-1. In a terminal, change into this `holo-card-ar` folder and run `node server.js`.
+1. In a terminal, change into this `ude-ar-holos` folder and run `node server.js`.
 2. Open **http://localhost:8000** on the same computer. Do not open `index.html` directly as a `file://` URL; the browser blocks the model and tracking-file requests that way.
 3. Allow camera access, then point the webcam at a print or another screen showing `assets/target_holo.png`.
 4. For a phone test, host this folder at an **HTTPS** URL, open it in Safari or Chrome, allow camera access, and point the phone at the card. A plain local-network HTTP address will not grant phone camera access.
 
-The page currently uses `assets/targets.mind` and `assets/hainanese_chicken_rice.glb`.
-The food model is scaled to 20% and rotated 90 degrees so the plate faces the camera and occupies about two-thirds of the tracked card width.
+The page uses `assets/targets.mind`, `assets/ghost-cutout.png`, and `assets/hainanese_chicken_rice.glb`. The ghost pops out when the card is found. Tap **Reveal the meal** to bring up the food model. The food model is scaled to 20% and rotated 90 degrees so the plate faces the camera.
+
+### Add the pronunciation later
+
+Record a fluent Hokkien speaker saying “Chiah pah bway?”, save the recording as `assets/chiah-pah-bway.mp3`, then change `const phraseAudioReady = false;` to `true` in `index.html`. The **Hear the phrase** button will appear. A tap starts playback, as mobile browsers require for audio.
 
 The model metadata credits [National Heritage Board, "Hainanese Chicken Rice"](https://sketchfab.com/3d-models/hainanese-chicken-rice-6a0d0aa3851849508f584248f96cd417) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Keep this attribution with any published prototype that uses it.
 
@@ -27,7 +30,7 @@ The QR code opens the webpage. Once open, the webpage uses the card artwork as i
 
 ## Put it on the web
 
-The `publish` folder contains the ready-to-upload static site. It has `index.html` plus the tracking image, compiled target, and 3 MB model. It excludes the local Node server and the unused 22 MB model.
+The sibling `../publish` folder contains the ready-to-upload static site. It has `index.html` plus the tracking image, ghost sprite, compiled target, and 3 MB model. It excludes the local Node server and the unused 22 MB model. After editing this source folder, run `./sync-publish.ps1` to update `../publish`.
 
 1. Visit [Netlify Drop](https://app.netlify.com/drop) and drag the entire `publish` folder onto the upload area.
 2. Open the resulting `https://...netlify.app` address on a phone, allow camera access, and point it at the printed card.
